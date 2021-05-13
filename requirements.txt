@@ -29,3 +29,4 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
 urllib3==1.26.4
 XlsxWriter==1.4.2
+xmltodict==0.12.0
