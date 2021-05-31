@@ -17,6 +17,7 @@ def shodan_search(search, API_KEY):
         #results = api.search(search, page=1)
         results = api.search(search)
         total_results = results['total']
+        # need to caculate pages from here
         print('[+] Total results: {0}'.format(total_results))
         open_instances = []
         for r in results['matches']:
@@ -41,15 +42,17 @@ def shodan_search(search, API_KEY):
         print ('[!] Shodan search error: {}'.format(e))
     return open_instances
 
-def nmap_scan(open_instances):
+def nmap_scan(open_instances, NSE_SCRIPT_PATH, VERBOSE):
     nmap_results = []
-
-    #open_instances = [{'ip':'149.28.233.75', 'port':''}]
     for open_instance in open_instances:
-        print("grabbing beacon from {}:{}".format(open_instance['ip'],open_instance['port']))
-#        results = nmap.scan_top_ports(open_instance['ip'],args='-p ' + str(open_instance['port']) + ' --script=/Users/jhernandez/splunk/cobalt_scanner/grab_beacon_config.nse')
-        cmd = ['/usr/bin/nmap', open_instance['ip'], '--script=/home/jhernandez/splunk/cobalt-pickaxe/grab_beacon_config.nse','-oX', '-']
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        if VERBOSE:
+            print("grabbing beacon from {}:{}".format(open_instance['ip'],open_instance['port']))
+        if open_instance['port'] ==  '':
+            cmd = ['/usr/local/bin/nmap', open_instance['ip'], NSE_SCRIPT_PATH,'-vv','-d', '-oX', '-']
+            result = subprocess.run(cmd, capture_output=True, text=True)
+        else:
+            cmd = ['/usr/local/bin/nmap', open_instance['ip'], '-p', str(open_instance['port']), NSE_SCRIPT_PATH,'-vv','-d', '-oX', '-']
+            result = subprocess.run(cmd, capture_output=True, text=True)
         json_result = dict()
         json_result = xmltodict.parse(result.stdout)
         print(json.dumps(json_result, indent=2))
@@ -60,9 +63,12 @@ def ips_from_inputfile(INPUT_FILE):
     cobalt_ips = []
     ips_file = open(INPUT_FILE,'r')
     for ip in ips_file.readlines():
+        match = dict()
         try:
             socket.inet_aton(ip)
-            cobalt_ips.append(ip.rstrip())
+            match['ip'] = ip.rstrip()
+            match['port'] = ''
+            cobalt_ips.append(match)
         except socket.error:
             print("ERROR, {0} not a valid ip address on file {1}".format(ip, INPUT_FILE))
             sys.exit(1)
@@ -98,6 +104,7 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", required=False, default='results.json.log', help="file to write to the results, defaults to results.json.log")
     parser.add_argument("-v", "--verbose", required=False, default=False, action='store_true', help="prints verbose output")
     parser.add_argument("-i", "--input", required=False, default = "", help="newline delimeted file of cobalt strike server ips to grab beacon configs from. example ips.txt")
+    parser.add_argument("--nse", required=False, default = "grab_beacon_config.nse", help="path to the nse script that rips down cobalt configs. Defaults to grab_beacon_config.nse")
     parser.add_argument("-s", "--search", required=False, default = "search.yml", help="contains the different searches to run on each service provider when hunting for team servers. Defaults to search.yml")
 
     # parse them
@@ -107,6 +114,7 @@ if __name__ == "__main__":
     VERBOSE = args.verbose
     INPUT_PATH = args.input
     SEARCH_YML = args.search
+    NSE_SCRIPT_PATH = args.nse
 
 
     if INPUT_PATH == "":
@@ -124,7 +132,7 @@ if __name__ == "__main__":
         cobalt_ips = ips_from_inputfile(abs_path)
         print("scanning for {0} ips from file".format(len(cobalt_ips)))
 
-
-    #nmap_results = nmap_scan(cobalt_ips)
+    script_path = os.path.abspath(NSE_SCRIPT_PATH)
+    nmap_results = nmap_scan(cobalt_ips, script_path, VERBOSE)
 
     print("finished successfully!")
