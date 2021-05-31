@@ -43,10 +43,12 @@ def shodan_search(search, API_KEY):
 
 def nmap_scan(open_instances):
     nmap_results = []
+
+    #open_instances = [{'ip':'149.28.233.75', 'port':''}]
     for open_instance in open_instances:
         print("grabbing beacon from {}:{}".format(open_instance['ip'],open_instance['port']))
 #        results = nmap.scan_top_ports(open_instance['ip'],args='-p ' + str(open_instance['port']) + ' --script=/Users/jhernandez/splunk/cobalt_scanner/grab_beacon_config.nse')
-        cmd = ['/usr/local/bin/nmap', open_instance['ip'], '-p', str(open_instance['port']), '--script=/Users/jhernandez/splunk/cobalt_scanner/grab_beacon_config.nse','-vv','-d', '-oX', '-']
+        cmd = ['/usr/bin/nmap', open_instance['ip'], '--script=/home/jhernandez/splunk/cobalt-pickaxe/grab_beacon_config.nse','-oX', '-']
         result = subprocess.run(cmd, capture_output=True, text=True)
         json_result = dict()
         json_result = xmltodict.parse(result.stdout)
