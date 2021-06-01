@@ -1,3 +1,7 @@
+# cobalt-pickaxe.conf
+# ignore project conf since it has creds
+cobalt-pickaxe.conf
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

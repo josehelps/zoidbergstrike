@@ -1,6 +1,5 @@
 #!/usr/bin/env python2
 
-import shodan
 import argparse
 import json
 import yaml
@@ -8,54 +7,25 @@ import subprocess
 import xmltodict
 import socket
 import os
+from pathlib import Path
+from modules.CustomConfigParser import CustomConfigParser
+from modules import logger, shodan
 
-def shodan_search(search, API_KEY):
-    api = shodan.Shodan(API_KEY)
-    ips_and_ports = []
+VERSION = 1
 
-    try:
-        #results = api.search(search, page=1)
-        results = api.search(search)
-        total_results = results['total']
-        # need to caculate pages from here
-        print('[+] Total results: {0}'.format(total_results))
-        open_instances = []
-        for r in results['matches']:
-            open_instance = dict()
-            open_instance ['ip'] = r['ip_str']
-            open_instance['port'] = r['port']
-            if 'domain' in r:
-                open_instance['domains'] = r['domain']
-            else:
-                open_instance['domains'] = ''
-            open_instance['hostnames'] = r['hostnames']
-            open_instance['timestamp'] = r['timestamp']
-            if 'ssl' in r:
-                open_instance['ssl'] = r['ssl']['cert']['subject']
-
-
-            #print ('{}'.format(open_instance))
-            open_instances.append(open_instance)
-#            print ('{} '.format(json.dumps(open_instance,indent=2)))
-
-    except Exception as e:
-        print ('[!] Shodan search error: {}'.format(e))
-    return open_instances
-
-def nmap_scan(open_instances, NSE_SCRIPT_PATH, VERBOSE):
+def nmap_scan(open_instances, NSE_SCRIPT_PATH, log):
     nmap_results = []
     for open_instance in open_instances:
-        if VERBOSE:
-            print("grabbing beacon from {}:{}".format(open_instance['ip'],open_instance['port']))
+        log.info("grabbing beacon from {}:{}".format(open_instance['ip'],open_instance['port']))
         if open_instance['port'] ==  '':
-            cmd = ['/usr/local/bin/nmap', open_instance['ip'], NSE_SCRIPT_PATH,'-vv','-d', '-oX', '-']
+            cmd = ['/usr/local/bin/nmap', open_instance['ip'], '--script', NSE_SCRIPT_PATH,'-vv','-d', '-oX', '-']
             result = subprocess.run(cmd, capture_output=True, text=True)
         else:
-            cmd = ['/usr/local/bin/nmap', open_instance['ip'], '-p', str(open_instance['port']), NSE_SCRIPT_PATH,'-vv','-d', '-oX', '-']
+            cmd = ['/usr/local/bin/nmap', open_instance['ip'], '-p', str(open_instance['port']), '--script', NSE_SCRIPT_PATH,'-vv','-d', '-oX', '-']
             result = subprocess.run(cmd, capture_output=True, text=True)
         json_result = dict()
         json_result = xmltodict.parse(result.stdout)
-        print(json.dumps(json_result, indent=2))
+        log.info(json.dumps(json_result, indent=2))
         nmap_results.append(json_result)
     return nmap_results
 
@@ -70,7 +40,7 @@ def ips_from_inputfile(INPUT_FILE):
             match['port'] = ''
             cobalt_ips.append(match)
         except socket.error:
-            print("ERROR, {0} not a valid ip address on file {1}".format(ip, INPUT_FILE))
+            log.error("{0} not a valid ip address on file {1}".format(ip, INPUT_FILE))
             sys.exit(1)
     return cobalt_ips
 
@@ -80,19 +50,16 @@ def read_searches(SEARCH_YML):
         searches = yaml.full_load(file)
     return searches
 
-def mine_cobalt(search, SHODAN_API, VERBOSE):
+def mine_cobalt(search, SHODAN_API, log):
     cobalt_ips = []
     if 'shodan' in search:
         for s in search['shodan']:
-            if VERBOSE:
-                print("collecting all servers in shodan with search: {}".format(s))
-            results = shodan_search(s, SHODAN_API)
-            if VERBOSE:
-                print("found {} matching instances".format(len(results)))
+            log.info("collecting all servers in shodan with search: {}".format(s))
+            results = shodan.search(s, SHODAN_API, log)
+            log.info("found {} matching instances".format(len(results)))
             for ip in results:
                 cobalt_ips.append(ip)
-    if VERBOSE:
-        print("total mined cobalt servers {}".format(len(cobalt_ips)))
+    log.info("total mined cobalt servers {}".format(len(cobalt_ips)))
     return cobalt_ips
 
 
@@ -100,39 +67,55 @@ if __name__ == "__main__":
 
     # grab arguments
     parser = argparse.ArgumentParser(description="scans for open cobalt strike team servers and grabs their beacon configs and write this as a json log to be analyzed by any analytic tools like splunk, elastic, etc..")
-    parser.add_argument("-a", "--apikey", required=True, help="api for shodan")
+    parser.add_argument("-c", "--config", required=False, default="cobalt-pickaxe.conf", help="config file path")
     parser.add_argument("-o", "--output", required=False, default='results.json.log', help="file to write to the results, defaults to results.json.log")
-    parser.add_argument("-v", "--verbose", required=False, default=False, action='store_true', help="prints verbose output")
+    parser.add_argument("-V", "--version", default=False, action="store_true", required=False, help="shows current cobalt-pickaxe version")
     parser.add_argument("-i", "--input", required=False, default = "", help="newline delimeted file of cobalt strike server ips to grab beacon configs from. example ips.txt")
-    parser.add_argument("--nse", required=False, default = "grab_beacon_config.nse", help="path to the nse script that rips down cobalt configs. Defaults to grab_beacon_config.nse")
-    parser.add_argument("-s", "--search", required=False, default = "search.yml", help="contains the different searches to run on each service provider when hunting for team servers. Defaults to search.yml")
 
     # parse them
     args = parser.parse_args()
-    SHODAN_API = args.apikey
+    config = args.config
     OUTPUT_FILE = args.output
-    VERBOSE = args.verbose
+    ARG_VERSION = args.version
     INPUT_PATH = args.input
-    SEARCH_YML = args.search
-    NSE_SCRIPT_PATH = args.nse
 
+    # needs config parser here
+    tool_config = Path(config)
+    if tool_config.is_file():
+        print("cobalt-pickaxe is using config at path {0}".format(tool_config))
+        configpath = str(tool_config)
+    else:
+        print("ERROR: cobalt-pickaxe failed to find a config file at {0} or {1}..exiting".format(tool_config))
+        sys.exit(1)
+
+    # Parse config
+    parser = CustomConfigParser()
+    config = parser.load_conf(configpath)
+
+    log = logger.setup_logging(config['log_path'], config['log_level'])
+    log.info("INIT - cobalt-pickaxe v" + str(VERSION))
+
+    if ARG_VERSION:
+        log.info("version: {0}".format(VERSION))
+        sys.exit(0)
+
+
+    SEARCH_YML = config['searches']
+    NSE_SCRIPT_PATH = config['nse_script']
 
     if INPUT_PATH == "":
-        if VERBOSE:
-            print("scanning for all potential cobalt server ips")
+        log.info("scanning for all potential cobalt server ips")
         cobalt_ips = []
         abs_path = os.path.abspath(SEARCH_YML)
         searches = read_searches(abs_path)
-        cobalt_ips = mine_cobalt(searches, SHODAN_API, VERBOSE)
-
+        cobalt_ips = mine_cobalt(searches, config['shodan_token'], log)
     else:
         abs_path = os.path.abspath(INPUT_PATH)
-        if VERBOSE:
-            print("reading from input file: {}".format(abs_path))
+        log.info("reading from input file: {}".format(abs_path))
         cobalt_ips = ips_from_inputfile(abs_path)
-        print("scanning for {0} ips from file".format(len(cobalt_ips)))
+        log.info("scanning for {0} ips from file".format(len(cobalt_ips)))
 
     script_path = os.path.abspath(NSE_SCRIPT_PATH)
-    nmap_results = nmap_scan(cobalt_ips, script_path, VERBOSE)
+    nmap_results = nmap_scan(cobalt_ips, script_path, log)
 
-    print("finished successfully!")
+    log.info("finished successfully!")
