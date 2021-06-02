@@ -9,7 +9,7 @@ log_level = INFO
 # Sets the log level for the logging
 # Possible values: INFO, ERROR
 
-nse_script = 'grab_beacon_config.nse'
+nse_script = grab_beacon_config.nse
 # path to the nse script that rips down cobalt configs. This is specifically using https://github.com/whickey-r7/grab_beacon_config
 
 searches = search.yml
