@@ -3,14 +3,12 @@
 import argparse
 import json
 import yaml
-import subprocess
-import xmltodict
 import socket
 import os
 import sys
 from pathlib import Path
 from modules.CustomConfigParser import CustomConfigParser
-from modules import logger, shodan
+from modules import logger, shodan, nmap
 
 VERSION = 1
 
@@ -19,45 +17,9 @@ def write_results(OUTPUT_FILE, results, log):
     try:
         with open(OUTPUT_FILE, 'a') as outfile:
             json.dump(results, outfile)
+        log.info("wrote {0} beacon data to result file: {0}".format(len(results),OUTPUT_FILE))
     except Exection as e:
         log.error("writing result file: {0}".format(str(e)))
-
-def parse_nmap(nmap_results, log):
-    results = []
-
-    for result in nmap_results:
-        match = dict()
-        if result['nmaprun']['host']['status']['@state'] == 'up':
-            for port in result['nmaprun']['host']['ports']['port']:
-                if 'script' in port:
-                    match = json.loads(port['script']['@output'])
-                    print(json.dumps(match,indent=2))
-    return results
-
-
-def check_nmap(log):
-# only support nix*  at the moment
-    try:
-        NMAP_PATH = subprocess.run(['which', 'nmap'], capture_output=True, text=True)
-    except:
-        log.error("nmap not found, please make sure nmap is installed and accessible via path (which nmap)")
-        sys.exit(1)
-    return NMAP_PATH.stdout.rstrip()
-
-def nmap_scan(open_instances, NSE_SCRIPT_PATH, NMAP_PATH, log):
-    nmap_results = []
-    for open_instance in open_instances:
-        log.info("grabbing beacon from {}:{}".format(open_instance['ip'],open_instance['port']))
-        if open_instance['port'] ==  '':
-            cmd = [NMAP_PATH, open_instance['ip'], '--script', NSE_SCRIPT_PATH,'-vv','-d', '-n', '-F', '-T5', '-oX', '-']
-            result = subprocess.run(cmd, capture_output=True, text=True)
-        else:
-            cmd = [NMAP_PATH, open_instance['ip'], '-p', str(open_instance['port']), '--script', NSE_SCRIPT_PATH,'-vv','-d', '-n', '-F', '-T5', '-oX', '-']
-            result = subprocess.run(cmd, capture_output=True, text=True)
-        json_result = dict()
-        json_result = xmltodict.parse(result.stdout)
-        nmap_results.append(json_result)
-    return nmap_results
 
 def ips_from_inputfile(INPUT_FILE):
     cobalt_ips = []
@@ -129,7 +91,7 @@ if __name__ == "__main__":
         log.info("version: {0}".format(VERSION))
         sys.exit(0)
 
-    NMAP_PATH = check_nmap(log)
+    NMAP_PATH = nmap.check(log)
     SEARCH_YML = config['searches']
     NSE_SCRIPT_PATH = config['nse_script']
 
@@ -146,8 +108,8 @@ if __name__ == "__main__":
         log.info("scanning for {0} ips from file".format(len(cobalt_ips)))
 
     NSE_SCRIPT_PATH = os.path.abspath(NSE_SCRIPT_PATH)
-    nmap_results = nmap_scan(cobalt_ips, NSE_SCRIPT_PATH, NMAP_PATH, log)
-    results = parse_nmap(nmap_results, log)
+    nmap_results = nmap.scan(cobalt_ips, NSE_SCRIPT_PATH, NMAP_PATH, log)
+    results = nmap.parse(nmap_results, log)
     write_results(OUTPUT_FILE, results, log)
 
     log.info("finished successfully!")
