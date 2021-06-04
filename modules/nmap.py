@@ -66,6 +66,24 @@ def parse(nmap_results, log):
                 parsed_result['x64_config_method_2'] = match['x64']['config']['Method 2']
             if 'Port' in match['x64']['config']:
                 parsed_result['x64_config_port'] = match['x64']['config']['Port']
+            if 'Max DNS' in match['x64']['config']:
+                parsed_result['max_dns'] = match['x64']['config']['Max DNS']
+            if 'DNS Idle' in match['x64']['config']:
+                parsed_result['dns_idle'] = match['x64']['config']['DNS Idle']
+            if 'DNS Sleep' in match['x64']['config']:
+                parsed_result['dns_sleep'] = match['x64']['config']['DNS Sleep']
+            if 'User Agent' in match['x64']['config']:
+                parsed_result['user_agent'] = match['x64']['config']['User Agent']
+            if 'CreateRemoteThread' in match['x64']['config']:
+                parsed_result['createremotethread'] = match['x64']['config']['CreateRemoteThread']
+            if 'Proxy Hostname' in match['x64']['config']:
+                parsed_result['proxy_hostname'] = match['x64']['config']['Proxy Hostname']
+            if 'Proxy Username' in match['x64']['config']:
+                parsed_result['proxy_username'] = match['x64']['config']['Proxy Username']
+            if 'Proxy Password' in match['x64']['config']:
+                parsed_result['proxy_password'] = match['x64']['config']['Proxy Password']
+            if 'Proxy Access Type' in match['x64']['config']:
+                parsed_result['proxy_access_type'] = match['x64']['config']['Proxy Access Type']
             if 'Spawn To x64' in match['x64']['config']:
                 parsed_result['x64_config_spawn_to_x64'] = match['x64']['config']['Spawn To x64']
             if 'Spawn To x86' in match['x64']['config']:
