@@ -2,6 +2,7 @@
 import subprocess
 import xmltodict
 import json
+import time
 
 def check(log):
 # only support nix*  at the moment
@@ -15,7 +16,7 @@ def check(log):
 def scan(open_instances, NSE_SCRIPT_PATH, NMAP_PATH, log):
     nmap_results = []
     for open_instance in open_instances:
-        log.info("grabbing beacon from {}:{}".format(open_instance['ip'],open_instance['port']))
+        log.info("reducing beacon from {}:{}".format(open_instance['ip'],open_instance['port']))
         if open_instance['port'] ==  '':
             cmd = [NMAP_PATH, open_instance['ip'], '--script', NSE_SCRIPT_PATH,'-vv','-d', '-n', '-F', '-T5', '-oX', '-']
             result = subprocess.run(cmd, capture_output=True, text=True)
@@ -33,29 +34,51 @@ def parse(nmap_results, log):
     for result in nmap_results:
         match = dict()
         parsed_result = dict()
-        #print(json.dumps(result))
+        # check if host is even up
         if result['nmaprun']['host']['status']['@state'] == 'up':
+            # if it is up, lets dig out the beacon info and port info
             if isinstance(result['nmaprun']['host']['ports']['port'], list):
                 for port in result['nmaprun']['host']['ports']['port']:
                     if "script" in port:
                         match = json.loads(port['script']['@output'])
-                        print(json.dumps(match,indent=2))
+                        match['port'] = port
             else:
                 if "script" in result['nmaprun']['host']['ports']['port']:
                     port = result['nmaprun']['host']['ports']['port']
                     match = json.loads(port['script']['@output'])
-                    print(json.dumps(match,indent=2))
-        parsed_result['ip'] = 
-        parsed_result['domain'] =
-        parsed_result['hostname'] =
-        parsed_result['x64_config_method_1'] =
-        parsed_result['x64_config_port'] =
-        parsed_result['x64_config_spawn_to'] =
-        parsed_result['x64_config_jitter'] =
-        parsed_result['x64_config_c2_server'] =
-        parsed_result['x64_config_beacon_type'] =
-        parsed_result['x64_config_method_1'] =
-        parsed_result['x64_config_method_2'] =
-        parsed_result['x64_config_method_1'] =
-
+                    match['port'] = port
+        # if we do have a match lets parse it into our own structure
+        if match:
+            print(json.dumps(match))
+            parsed_result['timestamp'] = time.time()
+            parsed_result['nmap_cmd'] = result['nmaprun']['@args']
+            parsed_result['ip'] = result['nmaprun']['host']['address']['@addr']
+            parsed_result['port'] = match['port']['@portid']
+            parsed_result['protocol'] = match['port']['@protocol']
+            parsed_result['service'] = match['port']['service']['@name']
+            parsed_result['hostnames'] = result['nmaprun']['host']['hostnames']
+            parsed_result['x64_sha1'] = match['x64']['sha1']
+            parsed_result['x64_sha256'] = match['x64']['sha256']
+            parsed_result['x64_md5'] = match['x64']['md5']
+            if 'Method 1' in match['x64']['config']:
+                parsed_result['x64_config_method_1'] = match['x64']['config']['Method 1']
+            if 'Method 2' in match['x64']['config']:
+                parsed_result['x64_config_method_2'] = match['x64']['config']['Method 2']
+            if 'Port' in match['x64']['config']:
+                parsed_result['x64_config_port'] = match['x64']['config']['Port']
+            if 'Spawn To x64' in match['x64']['config']:
+                parsed_result['x64_config_spawn_to_x64'] = match['x64']['config']['Spawn To x64']
+            if 'Spawn To x86' in match['x64']['config']:
+                parsed_result['x64_config_spawn_to_x86'] = match['x64']['config']['Spawn To x86']
+            if 'Jitter' in match['x64']['config']:
+                parsed_result['x64_config_jitter'] = match['x64']['config']['Jitter']
+            if 'Polling' in match['x64']['config']:
+                parsed_result['x64_config_polling'] = match['x64']['config']['Polling']
+            if 'C2 Server' in match['x64']['config']:
+                parsed_result['x64_config_c2_server'] = match['x64']['config']['C2 Server']
+            if 'Beacon Type' in match['x64']['config']:
+                parsed_result['x64_config_beacon_type'] = match['x64']['config']['Beacon Type']
+            if 'HTTP Method Path 2' in match['x64']['config']:      
+                parsed_result['x64_config_http_method_path_2'] = match['x64']['config']['HTTP Method Path 2']
+            results.append(parsed_result)
     return results
