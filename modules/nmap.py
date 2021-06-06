@@ -37,19 +37,31 @@ def parse(nmap_results, log):
         # check if host is even up
         if result['nmaprun']['host']['status']['@state'] == 'up':
             # if it is up, lets dig out the beacon info and port info
+            # we need to check if port is a array or dict since it changes depending on nmaps args
+            # if -p used it will return a dict
             if isinstance(result['nmaprun']['host']['ports']['port'], list):
                 for port in result['nmaprun']['host']['ports']['port']:
                     if "script" in port:
-                        match = json.loads(port['script']['@output'])
-                        match['port'] = port
+                        log.debug("parsing output: {0}".format(port['script']['@output']))
+                        # we need to make sure that it is json, this has failed before
+                        try:
+                            match = json.loads(port['script']['@output'])
+                            match['port'] = port
+                        except Exception as e:
+                            log.info('nmap error: {0}, parsing output: {1}'.format(e, port['script']['@output']))
             else:
                 if "script" in result['nmaprun']['host']['ports']['port']:
                     port = result['nmaprun']['host']['ports']['port']
-                    match = json.loads(port['script']['@output'])
-                    match['port'] = port
+                    log.debug("parsing output: {0}".format(port['script']['@output']))
+                    # we need to make sure that it is json, this has failed before
+                    try:
+                        match = json.loads(port['script']['@output'])
+                        match['port'] = port
+                    except Exception as e:
+                        log.info('nmap error: {0}, parsing output: {1}'.format(e, port['script']['@output']))
+
         # if we do have a match lets parse it into our own structure
         if match:
-            print(json.dumps(match))
             parsed_result['timestamp'] = time.time()
             parsed_result['nmap_cmd'] = result['nmaprun']['@args']
             parsed_result['ip'] = result['nmaprun']['host']['address']['@addr']
@@ -63,6 +75,8 @@ def parse(nmap_results, log):
             parsed_result['x86_sha1'] = match['x86']['sha1']
             parsed_result['x86_sha256'] = match['x86']['sha256']
             parsed_result['x86_md5'] = match['x86']['md5']
+
+            # values we need to make sure they are present
             if 'Method 1' in match['x64']['config']:
                 parsed_result['x64_config_method_1'] = match['x64']['config']['Method 1']
             if 'Method 2' in match['x64']['config']:
@@ -103,5 +117,6 @@ def parse(nmap_results, log):
                 parsed_result['x86_config_beacon_type'] = match['x86']['config']['Beacon Type']
             if 'HTTP Method Path 2' in match['x86']['config']:
                 parsed_result['x86_config_http_method_path_2'] = match['x86']['config']['HTTP Method Path 2']
+            log.debug("parsed_result:\n{0}".format(json.dumps(parsed_result,indent=2)))
             results.append(parsed_result)
     return results
