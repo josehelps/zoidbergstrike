@@ -1,7 +1,16 @@
 # cobalt-pickaxe
 cobalt strike scanner
 
+# Credits
+NSE Script
+Nmap 
+
 # TODO
-* read from text file
-* read searches from a file
-* write output to a file
+* paginate shodan
+* comma split C2 server
+* add remaining beacon data from nse script (do not have everything parsed)
+* updated README...
+
+later 
+* add zoomeye
+* add securitytrails
