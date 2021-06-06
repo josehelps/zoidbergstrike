@@ -1,12 +1,13 @@
-# cobalt-pickaxe
+# cobalt-pickaxe ⛏
 A tool to hunt/mine for Cobalt Strike beacons and "reduce"
 their beacon configuration for later indexing. Hunts can either be expansive and internet wide using services like securitytrails, shodan, or zoomeye or specific to an list of ips.
+
 ![](static/minerman.png)
 
 ### Getting started
  
 1. [Install](#installation) the tool
-2. [Configure](#configuration) your tokens if doing internet hunts
+2. [Configure](#configuration) cobalt-your tokens if doing internet hunts
 3. [Mine](#search-examples) (search) for beacons
 4. See results `cat results.json | jq`
 
@@ -16,7 +17,7 @@ their beacon configuration for later indexing. Hunts can either be expansive and
 
 ### Installation 
 
-* requirements:     `virtualenv, python3`
+Requirements: `virtualenv`, and `python3`
 
 1. `git clone https://github.com/d1vious/cobalt-pickaxe && cd cobalt-pickaxe` clone project and cd into the project dir
 2. `pip install virtualenv && virtualenv -p python3 venv && source venv/bin/activate && pip install -r requirements.txt` create virtualenv and install requirements
@@ -25,7 +26,11 @@ Continue to [configuring](#configuration) a Security Trails, Shodan, or ZoomEye 
 
 ### Configuration [`cobalt-pickaxe.conf`](https://github.com/d1vious/cobalt-pickaxe/blob/master/cobalt-pickaxe.conf.example)
 
+Copy `cobalt-pickaxe.conf.example` to `cobalt-pickaxe.conf`!
+
 Make sure you set a token for one of the available [providers](https://github.com/d1vious/cobalt-pickaxe/blob/main/cobalt-pickaxe.conf.example#L18-L25). If you need to create one for your account follow [these](htt://need wiki page) instructions. 
+
+
 
 ```
 [global]
