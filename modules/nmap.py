@@ -14,7 +14,7 @@ def check(log):
             log.error("nmap not found, please make sure nmap is installed and accessible via path (which nmap)")
             sys.exit(1)
     except Exception as e:
-        log.error("Error: {0}, please make sure nmap is installed and accessible via path (which nmap).".format(e))
+        log.error("{0}, please make sure nmap is installed and accessible via path (which nmap).".format(e))
         sys.exit(1)
     return NMAP_PATH.stdout.rstrip()
 
