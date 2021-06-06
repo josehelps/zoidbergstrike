@@ -78,10 +78,10 @@ def parse(nmap_results, log):
             if 'Polling' in match['x64']['config']:
                 parsed_result['x64_config_polling'] = match['x64']['config']['Polling']
             if 'C2 Server' in match['x64']['config']:
-                parsed_result['x64_config_c2_server'] = match['x64']['config']['C2 Server']
+                parsed_result['x64_config_c2_server'] = match['x64']['config']['C2 Server'].split(",")
             if 'Beacon Type' in match['x64']['config']:
                 parsed_result['x64_config_beacon_type'] = match['x64']['config']['Beacon Type']
-            if 'HTTP Method Path 2' in match['x64']['config']:      
+            if 'HTTP Method Path 2' in match['x64']['config']:
                 parsed_result['x64_config_http_method_path_2'] = match['x64']['config']['HTTP Method Path 2']
             if 'Method 1' in match['x86']['config']:
                 parsed_result['x86_config_method_1'] = match['x64']['config']['Method 1']
@@ -98,10 +98,10 @@ def parse(nmap_results, log):
             if 'Polling' in match['x64']['config']:
                 parsed_result['x86_config_polling'] = match['x86']['config']['Polling']
             if 'C2 Server' in match['x64']['config']:
-                parsed_result['x86_config_c2_server'] = match['x86']['config']['C2 Server']
+                parsed_result['x86_config_c2_server'] = match['x86']['config']['C2 Server'].split(",")
             if 'Beacon Type' in match['x64']['config']:
                 parsed_result['x86_config_beacon_type'] = match['x86']['config']['Beacon Type']
-            if 'HTTP Method Path 2' in match['x86']['config']:      
+            if 'HTTP Method Path 2' in match['x86']['config']:
                 parsed_result['x86_config_http_method_path_2'] = match['x86']['config']['HTTP Method Path 2']
             results.append(parsed_result)
     return results
