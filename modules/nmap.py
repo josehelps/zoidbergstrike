@@ -1,15 +1,20 @@
-
 import subprocess
 import xmltodict
 import json
 import time
+import sys
+
 
 def check(log):
 # only support nix*  at the moment
     try:
         NMAP_PATH = subprocess.run(['which', 'nmap'], capture_output=True, text=True)
-    except:
-        log.error("nmap not found, please make sure nmap is installed and accessible via path (which nmap)")
+        print(NMAP_PATH.stdout.rstrip())
+        if NMAP_PATH.stdout.rstrip() == "":
+            log.error("nmap not found, please make sure nmap is installed and accessible via path (which nmap)")
+            sys.exit(1)
+    except Exception as e:
+        log.error("Error: {0}, please make sure nmap is installed and accessible via path (which nmap).".format(e))
         sys.exit(1)
     return NMAP_PATH.stdout.rstrip()
 
