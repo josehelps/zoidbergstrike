@@ -60,34 +60,15 @@ def parse(nmap_results, log):
             parsed_result['x64_sha1'] = match['x64']['sha1']
             parsed_result['x64_sha256'] = match['x64']['sha256']
             parsed_result['x64_md5'] = match['x64']['md5']
+            parsed_result['x86_sha1'] = match['x86']['sha1']
+            parsed_result['x86_sha256'] = match['x86']['sha256']
+            parsed_result['x86_md5'] = match['x86']['md5']
             if 'Method 1' in match['x64']['config']:
                 parsed_result['x64_config_method_1'] = match['x64']['config']['Method 1']
             if 'Method 2' in match['x64']['config']:
                 parsed_result['x64_config_method_2'] = match['x64']['config']['Method 2']
             if 'Port' in match['x64']['config']:
                 parsed_result['x64_config_port'] = match['x64']['config']['Port']
-            if 'Max DNS' in match['x64']['config']:
-                parsed_result['max_dns'] = match['x64']['config']['Max DNS']
-            if 'DNS Idle' in match['x64']['config']:
-                parsed_result['dns_idle'] = match['x64']['config']['DNS Idle']
-            if 'DNS Sleep' in match['x64']['config']:
-                parsed_result['dns_sleep'] = match['x64']['config']['DNS Sleep']
-            if 'User Agent' in match['x64']['config']:
-                parsed_result['user_agent'] = match['x64']['config']['User Agent']
-            if 'CreateRemoteThread' in match['x64']['config']:
-                parsed_result['createremotethread'] = match['x64']['config']['CreateRemoteThread']
-            if 'Watermark' in match['x64']['config']:
-                parsed_result['watermark'] = match['x64']['config']['Watermark']
-            if 'C2 Host Header' in match['x64']['config']:
-                parsed_result['c2_host_header'] = match['x64']['config']['C2 Host Header']
-            if 'Proxy Hostname' in match['x64']['config']:
-                parsed_result['proxy_hostname'] = match['x64']['config']['Proxy Hostname']
-            if 'Proxy Username' in match['x64']['config']:
-                parsed_result['proxy_username'] = match['x64']['config']['Proxy Username']
-            if 'Proxy Password' in match['x64']['config']:
-                parsed_result['proxy_password'] = match['x64']['config']['Proxy Password']
-            if 'Proxy Access Type' in match['x64']['config']:
-                parsed_result['proxy_access_type'] = match['x64']['config']['Proxy Access Type']
             if 'Spawn To x64' in match['x64']['config']:
                 parsed_result['x64_config_spawn_to_x64'] = match['x64']['config']['Spawn To x64']
             if 'Spawn To x86' in match['x64']['config']:
@@ -102,5 +83,25 @@ def parse(nmap_results, log):
                 parsed_result['x64_config_beacon_type'] = match['x64']['config']['Beacon Type']
             if 'HTTP Method Path 2' in match['x64']['config']:      
                 parsed_result['x64_config_http_method_path_2'] = match['x64']['config']['HTTP Method Path 2']
+            if 'Method 1' in match['x86']['config']:
+                parsed_result['x86_config_method_1'] = match['x64']['config']['Method 1']
+            if 'Method 2' in match['x64']['config']:
+                parsed_result['x86_config_method_2'] = match['x64']['config']['Method 2']
+            if 'Port' in match['x86']['config']:
+                parsed_result['x86_config_port'] = match['x64']['config']['Port']
+            if 'Spawn To x64' in match['x86']['config']:
+                parsed_result['x86_config_spawn_to_x64'] = match['x86']['config']['Spawn To x64']
+            if 'Spawn To x86' in match['x86']['config']:
+                parsed_result['x86_config_spawn_to_x86'] = match['x86']['config']['Spawn To x86']
+            if 'Jitter' in match['x86']['config']:
+                parsed_result['x86_config_jitter'] = match['x86']['config']['Jitter']
+            if 'Polling' in match['x64']['config']:
+                parsed_result['x86_config_polling'] = match['x86']['config']['Polling']
+            if 'C2 Server' in match['x64']['config']:
+                parsed_result['x86_config_c2_server'] = match['x86']['config']['C2 Server']
+            if 'Beacon Type' in match['x64']['config']:
+                parsed_result['x86_config_beacon_type'] = match['x86']['config']['Beacon Type']
+            if 'HTTP Method Path 2' in match['x86']['config']:      
+                parsed_result['x86_config_http_method_path_2'] = match['x86']['config']['HTTP Method Path 2']
             results.append(parsed_result)
     return results
