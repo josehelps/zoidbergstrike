@@ -144,6 +144,10 @@ def parse(nmap_results, log):
                 parsed_result['x86_config_beacon_type'] = match['x86']['config']['Beacon Type']
             if 'HTTP Method Path 2' in match['x86']['config']:
                 parsed_result['x86_config_http_method_path_2'] = match['x86']['config']['HTTP Method Path 2']
+            if 'URI Queried' in match['x64']['config']:
+                parsed_result['x64_uri_queried'] = match['x64']['config']['URI Queried']
+            if 'URI Queried' in match['x86']['config']:
+                parsed_result['x86_uri_queried'] = match['x86']['config']['URI Queried']
             log.debug("parsed_result:\n{0}".format(json.dumps(parsed_result,indent=2)))
             results.append(parsed_result)
     return results
