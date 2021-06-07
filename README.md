@@ -1,36 +1,36 @@
 # cobalt-pickaxe ⛏
 A tool to hunt/mine for Cobalt Strike beacons and "reduce"
-their beacon configuration for later indexing. Hunts can either be expansive and internet wide using services like securitytrails, shodan, or zoomeye or specific to an list of ips.
+their beacon configuration for later indexing. Hunts can either be expansive and internet wide using services like SecurityTrails, Shodan, or ZoomEye or a list of IP's. 
 
 ![](static/minerman.png)
 
-### Getting started
+## Getting started
  
-1. [Install](#installation) the tool
-2. [Configure](#configuration) cobalt-your tokens if doing internet hunts
-3. [Mine](#search-examples) (search) for beacons
-4. See results `cat results.json | jq`
+1. [Install](#installation) Cobalt-PickAxe 
+2. [Configure](#configuration) your tokens to begin the hunt
+3. [Mine](#search-examples) Beacons to begin reducing them
+4. Review results `cat results.json | jq`
 
 :tv: **Demo**
 
 ![](static/demo.gif)
 
-### Installation 
+## Installation 
 
 Requirements: `virtualenv`, and `python3`
 
-1. `git clone https://github.com/d1vious/cobalt-pickaxe && cd cobalt-pickaxe` clone project and cd into the project dir
-2. `pip install virtualenv && virtualenv -p python3 venv && source venv/bin/activate && pip install -r requirements.txt` create virtualenv and install requirements
+1. `git clone https://github.com/d1vious/cobalt-pickaxe && cd cobalt-pickaxe` Clone project and cd into the project dir.
+2. `pip install virtualenv && virtualenv -p python3 venv && source venv/bin/activate && pip install -r requirements.txt` Create Virtualenv and install requirements.
 
-Continue to [configuring](#configuration) a Security Trails, Shodan, or ZoomEye API key.
+Continue to [configuring](#configuration) for SecurityTrails, Shodan, or ZoomEye API key.
 
 ### Configuration [`cobalt-pickaxe.conf`](https://github.com/d1vious/cobalt-pickaxe/blob/master/cobalt-pickaxe.conf.example)
 
 Copy `cobalt-pickaxe.conf.example` to `cobalt-pickaxe.conf`!
 
-Make sure you set a token for one of the available [providers](https://github.com/d1vious/cobalt-pickaxe/blob/main/cobalt-pickaxe.conf.example#L18-L25). If you need to create one for your account follow [these](htt://need wiki page) instructions. 
+Make sure to set a token for one of the available [providers](https://github.com/d1vious/cobalt-pickaxe/blob/main/cobalt-pickaxe.conf.example#L18-L25). If you need to create one for your account follow [these](htt://need wiki page) instructions. 
 
-
+Configuration example:
 
 ```
 [global]
@@ -42,7 +42,7 @@ log_path = cobalt-pickaxe.log
 
 log_level = INFO
 # Sets the log level for the logging
-# Possible values: INFO, ERROR
+# Possible values: INFO, ERROR, VERBOSE
 
 nse_script = grab_beacon_config.nse
 # path to the nse script that rips down cobalt configs. This is specifically using https://github.com/whickey-r7/grab_beacon_config
@@ -61,7 +61,8 @@ securitytrails_token = TOKENHERE
 ```
 
 ### Search The Internet
-To modify the default mining done across different providers customize `search.yml`. To understand what cobalt-pickaxe checks by default see [Search Examples](#search-examples).
+
+To modify the default mining performed across different providers, customize `search.yml`. The default Cobalt-PickAxe [Search Examples](#search-examples) below.
 
 Run:
 
@@ -82,14 +83,14 @@ Run:
 
 If you need inspiration from hunters we highly recommend:
 
-* [Mike]()
-* [DFI report]()
-* [Brad]()
+* [The DFIR Report](https://twitter.com/TheDFIRReport)
+* [Awesome-Cobalt-Strike](https://github.com/MichaelKoczwara/Awesome-CobaltStrike-Defence)
+* [CobaltStrikeBot](https://twitter.com/cobaltstrikebot)
 
-### Usage
+## Usage
 
 ```
-usage: cobalt-pickaxe.py [-h] [-c CONFIG] [-o OUTPUT] [-V] [-i INPUT]
+usage: cobalt-pickaxe.py [-h] [-c CONFIG] [-o OUTPUT] [-v] [-i INPUT]
 
 scans for open cobalt strike team servers and grabs their beacon configs and write this as a json log to be analyzed by any analytic tools
 like splunk, elastic, etc..
@@ -100,14 +101,14 @@ optional arguments:
                         config file path
   -o OUTPUT, --output OUTPUT
                         file to write to the results, defaults to results.json.log
-  -V, --version         shows current cobalt-pickaxe version
+  -v, --version         shows current cobalt-pickaxe version
   -i INPUT, --input INPUT
                         newline delimeted file of cobalt strike server ips to grab beacon configs from. example ips.txt
 ```
 
 ### Search Examples
 
-All these are shipped out of the box configured under [`search.yml`](https://github.com/d1vious/cobalt-pickaxe/blob/main/search.yml). 
+The following searches are provided out of the box and more may be added to [`search.yml`](https://github.com/d1vious/cobalt-pickaxe/blob/main/search.yml) for more data. 
 
 #### SHODAN
 
@@ -120,16 +121,17 @@ All these are shipped out of the box configured under [`search.yml`](https://git
 
 # Author
 
-* Michael Haag [@Mhaggis]()
+* Michael Haag [@M_haggis](https://twitter.com/M_haggis)
 * Jose Hernandez [@d1vious](https://twitter.com/d1vious)
 
 # Credits & References
 
-Inspiration came from a hangful of blogs:
-Much of this is only possible because whiskey-7 shared with us grb_beacon.nse
+Inspiration came from a handful of blogs:
+Much of this is only possible because whiskey-7 shared with us grab_beacon_config.nse
 
 # TODO
-* add remaining beacon data from nse script (do not have everything parsed)
-* add zoomeye
-* add securitytrails
-* include ^ search examples
+- [x] add remaining beacon data from nse script (do not have everything parsed)
+- [ ] add zoomeye
+- [ ] add securitytrails
+- [ ] include ^ search examples
+- [ ] Fix output of -v / --version

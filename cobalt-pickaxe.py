@@ -17,9 +17,9 @@ def write_results(OUTPUT_FILE, results, log):
     try:
         with open(OUTPUT_FILE, 'a') as outfile:
             json.dump(results, outfile)
-        log.info("wrote {0} beacon data to result file: {0}".format(len(results),OUTPUT_FILE))
+        log.info("Wrote {0} beacon data to result file: {0}".format(len(results),OUTPUT_FILE))
     except Exection as e:
-        log.error("writing result file: {0}".format(str(e)))
+        log.error("Writing result file: {0}".format(str(e)))
 
 def ips_from_inputfile(INPUT_FILE):
     cobalt_ips = []
@@ -32,7 +32,7 @@ def ips_from_inputfile(INPUT_FILE):
             match['port'] = ''
             cobalt_ips.append(match)
         except socket.error:
-            log.error("{0} not a valid ip address on file {1}".format(ip, INPUT_FILE))
+            log.error("{0} Not a valid ip address on file {1}".format(ip, INPUT_FILE))
             sys.exit(1)
     return cobalt_ips
 
@@ -46,23 +46,23 @@ def mine_cobalt(search, SHODAN_API, log):
     cobalt_ips = []
     if 'shodan' in search:
         for s in search['shodan']:
-            log.info("collecting all servers in shodan with search: {}".format(s))
+            log.info("Gathering all IPs in Shodan with search: {}".format(s))
             results = shodan.search(s, SHODAN_API, log)
-            log.info("found {} matching instances".format(len(results)))
+            log.info("Identified {} matching instances".format(len(results)))
             for ip in results:
                 cobalt_ips.append(ip)
-    log.info("total mined cobalt servers {}".format(len(cobalt_ips)))
+    log.info("Total mined Cobalt Team Servers {}".format(len(cobalt_ips)))
     return cobalt_ips
 
 
 if __name__ == "__main__":
 
     # grab arguments
-    parser = argparse.ArgumentParser(description="scans for open cobalt strike team servers and grabs their beacon configs and write this as a json log to be analyzed by any analytic tools like splunk, elastic, etc..")
-    parser.add_argument("-c", "--config", required=False, default="cobalt-pickaxe.conf", help="config file path")
-    parser.add_argument("-o", "--output", required=False, default='results.json.log', help="file to write to the results, defaults to results.json.log")
-    parser.add_argument("-V", "--version", default=False, action="store_true", required=False, help="shows current cobalt-pickaxe version")
-    parser.add_argument("-i", "--input", required=False, default = "", help="newline delimeted file of cobalt strike server ips to grab beacon configs from. example ips.txt")
+    parser = argparse.ArgumentParser(description="Scans for publicly accessible Cobalt Strike Team Servers and grabs the beacon configuration and writes it out as a json log to be analyzed by any analytic tools like Splunk, Elastic, and so forth.")
+    parser.add_argument("-c", "--config", required=False, default="cobalt-pickaxe.conf", help="Path to configuration file. Default: cobalt-pickaxe.conf")
+    parser.add_argument("-o", "--output", required=False, default='results.json.log', help="File to write results to. Default: results.json.log")
+    parser.add_argument("-v", "--version", default=False, action="store_true", required=False, help="Shows current Cobalt-PickAxe version")
+    parser.add_argument("-i", "--input", required=False, default = "", help="Newline delimeted file of potential Cobalt Strike Team Servers IP's to grab beacon configurations from. Example - ips.txt")
 
     # parse them
     args = parser.parse_args()
