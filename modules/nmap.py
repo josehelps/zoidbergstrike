@@ -9,7 +9,6 @@ def check(log):
 # only support nix*  at the moment
     try:
         NMAP_PATH = subprocess.run(['which', 'nmap'], capture_output=True, text=True)
-        print(NMAP_PATH.stdout.rstrip())
         if NMAP_PATH.stdout.rstrip() == "":
             log.error("nmap not found, please make sure nmap is installed and accessible via path (which nmap)")
             sys.exit(1)
@@ -144,10 +143,10 @@ def parse(nmap_results, log):
                 parsed_result['x86_config_beacon_type'] = match['x86']['config']['Beacon Type']
             if 'HTTP Method Path 2' in match['x86']['config']:
                 parsed_result['x86_config_http_method_path_2'] = match['x86']['config']['HTTP Method Path 2']
-            if 'URI Queried' in match['x64']['config']:
-                parsed_result['x64_uri_queried'] = match['x64']['config']['URI Queried']
-            if 'URI Queried' in match['x86']['config']:
-                parsed_result['x86_uri_queried'] = match['x86']['config']['URI Queried']
+            if 'uri_queried' in match['x64']['config']:
+                parsed_result['x64_uri_queried'] = match['x64']['config']['uri_queried']
+            if 'uri_queried' in match['x86']['config']:
+                parsed_result['x86_uri_queried'] = match['x86']['config']['uri_queried']
             log.debug("parsed_result:\n{0}".format(json.dumps(parsed_result,indent=2)))
             results.append(parsed_result)
     return results
