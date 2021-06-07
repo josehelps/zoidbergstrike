@@ -135,3 +135,4 @@ Much of this is only possible because whiskey-7 shared with us grab_beacon_confi
 - [ ] add securitytrails
 - [ ] include ^ search examples
 - [ ] Fix output of -v / --version
+- [ ] Dedup results before nmap
