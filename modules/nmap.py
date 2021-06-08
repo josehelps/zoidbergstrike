@@ -5,6 +5,15 @@ import time
 import sys
 
 
+def parse_c2(c2s):
+    c2s = c2s.split(",")
+    # grab pairwise matches eg. (1,2), (3,4) to contruct domain,
+    pairswise = zip(c2s[::2], c2s[1::2])
+    parsed_c2s = []
+    for pair in pairswise:
+        parsed_c2s.append(''.join(pair))
+    return parsed_c2s
+
 def check(log):
 # only support nix*  at the moment
     try:
@@ -81,6 +90,7 @@ def parse(nmap_results, log):
             parsed_result['x86_md5'] = match['x86']['md5']
 
             # values we need to make sure they are present
+            # x64
             if 'Method 1' in match['x64']['config']:
                 parsed_result['x64_config_method_1'] = match['x64']['config']['Method 1']
             if 'Method 2' in match['x64']['config']:
@@ -118,11 +128,16 @@ def parse(nmap_results, log):
             if 'Polling' in match['x64']['config']:
                 parsed_result['x64_config_polling'] = match['x64']['config']['Polling']
             if 'C2 Server' in match['x64']['config']:
-                parsed_result['x64_config_c2_server'] = match['x64']['config']['C2 Server'].split(",")
+                parsed_c2s = parse_c2(match['x64']['config']['C2 Server'])
+                parsed_result['x64_config_c2_server'] = parsed_c2s
             if 'Beacon Type' in match['x64']['config']:
                 parsed_result['x64_config_beacon_type'] = match['x64']['config']['Beacon Type']
             if 'HTTP Method Path 2' in match['x64']['config']:
                 parsed_result['x64_config_http_method_path_2'] = match['x64']['config']['HTTP Method Path 2']
+            if 'uri_queried' in match['x64']:
+                parsed_result['x64_uri_queried'] = match['x64']['uri_queried']
+
+            # x86
             if 'Method 1' in match['x86']['config']:
                 parsed_result['x86_config_method_1'] = match['x64']['config']['Method 1']
             if 'Method 2' in match['x64']['config']:
@@ -135,16 +150,15 @@ def parse(nmap_results, log):
                 parsed_result['x86_config_spawn_to_x86'] = match['x86']['config']['Spawn To x86']
             if 'Jitter' in match['x86']['config']:
                 parsed_result['x86_config_jitter'] = match['x86']['config']['Jitter']
-            if 'Polling' in match['x64']['config']:
+            if 'Polling' in match['x86']['config']:
                 parsed_result['x86_config_polling'] = match['x86']['config']['Polling']
-            if 'C2 Server' in match['x64']['config']:
-                parsed_result['x86_config_c2_server'] = match['x86']['config']['C2 Server'].split(",")
-            if 'Beacon Type' in match['x64']['config']:
+            if 'C2 Server' in match['x86']['config']:
+                parsed_c2s = parse_c2(match['x86']['config']['C2 Server'])
+                parsed_result['x86_config_c2_server'] = parsed_c2s
+            if 'Beacon Type' in match['x86']['config']:
                 parsed_result['x86_config_beacon_type'] = match['x86']['config']['Beacon Type']
             if 'HTTP Method Path 2' in match['x86']['config']:
                 parsed_result['x86_config_http_method_path_2'] = match['x86']['config']['HTTP Method Path 2']
-            if 'uri_queried' in match['x64']:
-                parsed_result['x64_uri_queried'] = match['x64']['uri_queried']
             if 'uri_queried' in match['x86']['config']:
                 parsed_result['x86_uri_queried'] = match['x86']['uri_queried']
             log.debug("parsed_result:\n{0}".format(json.dumps(parsed_result,indent=2)))
