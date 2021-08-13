@@ -1,12 +1,12 @@
-# cobalt-pickaxe ⛏
+# zoidbergstrike ⛏
 A tool to hunt/mine for Cobalt Strike beacons and "reduce"
 their beacon configuration for later indexing. Hunts can either be expansive and internet wide using services like SecurityTrails, Shodan, or ZoomEye or a list of IP's. 
 
-![](static/minerman.png)
+![](static/logo.png)
 
 ## Getting started
  
-1. [Install](#installation) Cobalt-PickAxe 
+1. [Install](#installation) ZoidbergStrike 
 2. [Configure](#configuration) your tokens to begin the hunt
 3. [Mine](#search-examples) Beacons to begin reducing them
 4. Review results `cat results.json | jq`
@@ -17,18 +17,18 @@ their beacon configuration for later indexing. Hunts can either be expansive and
 
 ## Installation 
 
-Requirements: `virtualenv`, and `python3`
+Requirements: `virtualenv`, and `python3.8+`
 
-1. `git clone https://github.com/d1vious/cobalt-pickaxe && cd cobalt-pickaxe` Clone project and cd into the project dir.
+1. `git clone https://github.com/d1vious/zoidbergstrike && cd zoidbergstrike` Clone project and cd into the project dir.
 2. `pip install virtualenv && virtualenv -p python3 venv && source venv/bin/activate && pip install -r requirements.txt` Create Virtualenv and install requirements.
 
 Continue to [configuring](#configuration) for SecurityTrails, Shodan, or ZoomEye API key.
 
-### Configuration [`cobalt-pickaxe.conf`](https://github.com/d1vious/cobalt-pickaxe/blob/master/cobalt-pickaxe.conf.example)
+### Configuration [`zoidbergstrike.conf`](https://github.com/d1vious/zoidbergstrike/blob/master/zoidbergstrike.conf.example)
 
-Copy `cobalt-pickaxe.conf.example` to `cobalt-pickaxe.conf`!
+Copy `zoidbergstrike.conf.example` to `zoidbergstrike.conf`!
 
-Make sure to set a token for one of the available [providers](https://github.com/d1vious/cobalt-pickaxe/blob/main/cobalt-pickaxe.conf.example#L18-L25). If you need to create one for your account follow [these](htt://need wiki page) instructions. 
+Make sure to set a token for one of the available [providers](https://github.com/d1vious/zoidbergstrike/blob/main/zoidbergstrike.conf.example#L18-L25). If you need to create one for your account follow [these](htt://need wiki page) instructions. 
 
 Configuration example:
 
@@ -37,7 +37,7 @@ Configuration example:
 output = results.json
 # stores matches in JSON here
 
-log_path = cobalt-pickaxe.log
+log_path = zoidbergstrike.log
 # Sets the log_path for the logging file
 
 log_level = INFO
@@ -62,11 +62,11 @@ securitytrails_token = TOKENHERE
 
 ### Search The Internet
 
-To modify the default mining performed across different providers, customize `search.yml`. The default Cobalt-PickAxe [Search Examples](#search-examples) below.
+To modify the default mining performed across different providers, customize `search.yml`. The default ZoidbergStrike [Search Examples](#search-examples) below.
 
 Run:
 
-`python cobalt-pickaxe.py`
+`python zoidbergstrike.py`
 
 ### Search IP list
 populate `ips.txt` with potential Cobalt Strike C2 IPs a new line delimeted, example:
@@ -79,7 +79,7 @@ populate `ips.txt` with potential Cobalt Strike C2 IPs a new line delimeted, exa
 
 Run: 
 
-`python cobalt-pickaxe.py -i ips.txt`
+`python zoidbergstrike.py -i ips.txt`
 
 If you need inspiration from hunters we highly recommend:
 
@@ -90,7 +90,7 @@ If you need inspiration from hunters we highly recommend:
 ## Usage
 
 ```
-usage: cobalt-pickaxe.py [-h] [-c CONFIG] [-o OUTPUT] [-v] [-i INPUT]
+usage: zoidbergstrike.py [-h] [-c CONFIG] [-o OUTPUT] [-v] [-i INPUT]
 
 scans for open cobalt strike team servers and grabs their beacon configs and write this as a json log to be analyzed by any analytic tools
 like splunk, elastic, etc..
@@ -101,14 +101,14 @@ optional arguments:
                         config file path
   -o OUTPUT, --output OUTPUT
                         file to write to the results, defaults to results.json.log
-  -v, --version         shows current cobalt-pickaxe version
+  -v, --version         shows current zoidbergstrike version
   -i INPUT, --input INPUT
                         newline delimeted file of cobalt strike server ips to grab beacon configs from. example ips.txt
 ```
 
 ### Search Examples
 
-The following searches are provided out of the box and more may be added to [`search.yml`](https://github.com/d1vious/cobalt-pickaxe/blob/main/search.yml) for more data. 
+The following searches are provided out of the box and more may be added to [`search.yml`](https://github.com/d1vious/zoidbergstrike/blob/main/search.yml) for more data. 
 
 #### SHODAN
 
