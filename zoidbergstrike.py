@@ -6,9 +6,11 @@ import yaml
 import socket
 import os
 import sys
+import time
 from pathlib import Path
 from modules.CustomConfigParser import CustomConfigParser
-from modules import logger, shodan, nmap
+from modules import logger, shodan, nmap, securitytrails
+
 
 VERSION = 1
 
@@ -42,15 +44,24 @@ def read_searches(SEARCH_YML):
         searches = yaml.full_load(file)
     return searches
 
-def mine_cobalt(search, SHODAN_API, log):
+def mine_cobalt(search, config, log):
     cobalt_ips = []
     if 'shodan' in search:
         for s in search['shodan']:
             log.info("Gathering all IPs in Shodan with search: {}".format(s))
-            results = shodan.search(s, SHODAN_API, log)
+            results = shodan.search(s, config['shodan_token'], log)
             log.info("Identified {} matching instances".format(len(results)))
             for ip in results:
                 cobalt_ips.append(ip)
+    if 'securitytrails' in search:
+        for s in search['securitytrails']:
+            log.info("Gathering all IPs in SecurityTrail with search: {}".format(s))
+            results = securitytrails.search(s, config['securitytrails_token'], log)
+            log.info("Identified {} matching instances".format(len(results)))
+            for ip in results:
+                cobalt_ips.append(ip)
+            # sleep 1 second to not hit securitytrails api rate limit
+            time.sleep(1)
     log.info("Total mined Cobalt Team Servers {}".format(len(cobalt_ips)))
     return cobalt_ips
 
@@ -100,7 +111,8 @@ if __name__ == "__main__":
         cobalt_ips = []
         abs_path = os.path.abspath(SEARCH_YML)
         searches = read_searches(abs_path)
-        cobalt_ips = mine_cobalt(searches, config['shodan_token'], log)
+        print(searches)
+        cobalt_ips = mine_cobalt(searches, config, log)
     else:
         abs_path = os.path.abspath(INPUT_PATH)
         log.info("reading from input file: {}".format(abs_path))

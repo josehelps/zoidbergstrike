@@ -1,12 +1,12 @@
 # zoidbergstrike 👀
 A tool to hunt/mine for Cobalt Strike beacons and "reduce"
-their beacon configuration for later indexing. Hunts can either be expansive and internet wide using services like SecurityTrails, Shodan, or ZoomEye or a list of IP's. 
+their beacon configuration for later indexing. Hunts can either be expansive and internet wide using services like SecurityTrails, Shodan, or ZoomEye or a list of IP's.
 
 ![](static/logo.png)
 
 ## Getting started
- 
-1. [Install](#installation) ZoidbergStrike 
+
+1. [Install](#installation) ZoidbergStrike
 2. [Configure](#configuration) your tokens to begin the hunt
 3. [Mine](#search-examples) Beacons to begin reducing them
 4. Review results `cat results.json | jq`
@@ -15,7 +15,7 @@ their beacon configuration for later indexing. Hunts can either be expansive and
 
 ![](static/demo.gif)
 
-## Installation 
+## Installation
 
 Requirements: `virtualenv`, and `python3.8+`
 
@@ -28,7 +28,7 @@ Continue to [configuring](#configuration) for SecurityTrails, Shodan, or ZoomEye
 
 Copy `zoidbergstrike.conf.example` to `zoidbergstrike.conf`!
 
-Make sure to set a token for one of the available [providers](https://github.com/d1vious/zoidbergstrike/blob/main/zoidbergstrike.conf.example#L18-L25). If you need to create one for your account follow [these](htt://need wiki page) instructions. 
+Make sure to set a token for one of the available [providers](https://github.com/d1vious/zoidbergstrike/blob/main/zoidbergstrike.conf.example#L18-L25). If you need to create one for your account follow [these](htt://need wiki page) instructions.
 
 Configuration example:
 
@@ -77,7 +77,7 @@ populate `ips.txt` with potential Cobalt Strike C2 IPs a new line delimeted, exa
 3.3.3.3
 ```
 
-Run: 
+Run:
 
 `python zoidbergstrike.py -i ips.txt`
 
@@ -108,16 +108,25 @@ optional arguments:
 
 ### Search Examples
 
-The following searches are provided out of the box and more may be added to [`search.yml`](https://github.com/d1vious/zoidbergstrike/blob/main/search.yml) for more data. 
+The following searches are provided out of the box and more may be added to [`search.yml`](https://github.com/d1vious/zoidbergstrike/blob/main/search.yml) for more data.
 
-#### SHODAN
+#### Shodan
 
-##### Find specific [JARM](https://blog.cobaltstrike.com/2020/12/08/a-red-teamer-plays-with-jarm/) signatures, out of the box we track Cobalt Strike 4.x 
+##### Find specific [JARM](https://blog.cobaltstrike.com/2020/12/08/a-red-teamer-plays-with-jarm/) signatures, out of the box we track Cobalt Strike 4.x
 `'ssl.jarm:07d14d16d21d21d07c42d41d00041d24a458a375eef0c576d23a7bab9a9fb1'`
 
 ##### Team server detected by Shodan
 `'product:"cobalt strike team server"'`
 
+_note_: will generate alot of noisy results
+
+##### Team server certificate serial
+`'ssl.cert.serial:146473198'`
+
+#### SecurityTrails
+
+##### Find specific [JARM](https://blog.cobaltstrike.com/2020/12/08/a-red-teamer-plays-with-jarm/) signatures
+`'SELECT address, ports.port FROM ips WHERE jarm = "07d14d16d21d21d07c42d41d00041d24a458a375eef0c576d23a7bab9a9fb1"'`
 
 # Author
 
@@ -130,9 +139,5 @@ Inspiration came from a handful of blogs:
 Much of this is only possible because whiskey-7 shared with us grab_beacon_config.nse
 
 # TODO
-- [x] add remaining beacon data from nse script (do not have everything parsed)
 - [ ] add zoomeye
-- [ ] add securitytrails
-- [ ] include ^ search examples
-- [ ] Fix output of -v / --version
 - [ ] Dedup results before nmap
