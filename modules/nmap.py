@@ -173,6 +173,8 @@ def parse(result, log):
             parsed_result['x86_uri_queried'] = match['x86']['uri_queried']
 
         log.debug("parsed_result:\n{0}".format(json.dumps(parsed_result,indent=2)))
+        log.info("Successfully reduced beacon from {}:{}".format(parsed_result['ip'], parsed_result['port']))
+
         return parsed_result
 
     return results
