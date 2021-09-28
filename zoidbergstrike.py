@@ -120,8 +120,7 @@ if __name__ == "__main__":
         log.info("Scanning for {0} ips from file".format(len(cobalt_ips)))
 
     NSE_SCRIPT_PATH = os.path.abspath(NSE_SCRIPT_PATH)
-    nmap_results = nmap.scan(cobalt_ips, NSE_SCRIPT_PATH, NMAP_PATH, log)
-    results = nmap.parse(nmap_results, log)
+    results = nmap.scan(cobalt_ips, NSE_SCRIPT_PATH, NMAP_PATH, log)
     if results:
         write_results(OUTPUT_FILE, results, log)
     else:
