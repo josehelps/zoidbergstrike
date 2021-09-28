@@ -13,17 +13,17 @@ def search(search, API_KEY, log):
         #results = api.search(search, page=1)
 
         # need to caculate pages from here
-        log.info('shodan total results: {0}'.format(total_results))
-        log.info("processing page: {0} out of {1}".format(page_number,total_pages))
+        log.info('Shodan total results: {0}'.format(total_results))
+        log.info("Processing page: {0} out of {1}".format(page_number,total_pages))
 
         #results = api.search(search, page=1)
         for page_number in range(2, total_pages):
             if page_number != 1:
-                log.info("processing page: {0} out of {1}".format(page_number,total_pages))
+                log.info("Processing page: {0} out of {1}".format(page_number,total_pages))
                 results = api.search(search, page=page_number)
                 for r in results['matches']:
                     open_instance = dict()
-                    log.debug("found matching {0}:{1}".format(r['ip_str'],r['port']))
+                    log.debug("Found matching {0}:{1}".format(r['ip_str'],r['port']))
                     open_instance ['ip'] = r['ip_str']
                     open_instance['port'] = r['port']
                     if 'domain' in r:
@@ -40,5 +40,5 @@ def search(search, API_KEY, log):
 #                           print ('{} '.format(json.dumps(open_instance,indent=2)))
 
     except Exception as e:
-        log.info('shodan search error: {}'.format(e))
+        log.info('Shodan search error: {}'.format(e))
     return open_instances

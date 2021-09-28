@@ -2,7 +2,7 @@
 output = results.json
 # stores matches in JSON here
 
-log_path = cobalt-pickaxe.log
+log_path = zoidbergstrike.log
 # Sets the log_path for the logging file
 
 log_level = INFO

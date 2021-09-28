@@ -48,21 +48,21 @@ def mine_cobalt(search, config, log):
     cobalt_ips = []
     if 'shodan' in search:
         for s in search['shodan']:
-            log.info("Gathering all IPs in Shodan with search: {}".format(s))
+            log.info("Gathering all IPs from Shodan using search: {}".format(s))
             results = shodan.search(s, config['shodan_token'], log)
             log.info("Identified {} matching instances".format(len(results)))
             for ip in results:
                 cobalt_ips.append(ip)
     if 'securitytrails' in search:
         for s in search['securitytrails']:
-            log.info("Gathering all IPs in SecurityTrail with search: {}".format(s))
+            log.info("Gathering all IPs from SecurityTrails using search: {}".format(s))
             results = securitytrails.search(s, config['securitytrails_token'], log)
             log.info("Identified {} matching instances".format(len(results)))
             for ip in results:
                 cobalt_ips.append(ip)
             # sleep 1 second to not hit securitytrails api rate limit
             time.sleep(1)
-    log.info("Total mined Cobalt Team Servers {}".format(len(cobalt_ips)))
+    log.info("Cobalt Strike Team Servers found: {}".format(len(cobalt_ips)))
     return cobalt_ips
 
 
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     NSE_SCRIPT_PATH = config['nse_script']
 
     if INPUT_PATH == "":
-        log.info("scanning for all potential cobalt server ips")
+        log.info("Scanning for potential Cobalt Strike Team Server IPs")
         cobalt_ips = []
         abs_path = os.path.abspath(SEARCH_YML)
         searches = read_searches(abs_path)
@@ -115,13 +115,16 @@ if __name__ == "__main__":
         cobalt_ips = mine_cobalt(searches, config, log)
     else:
         abs_path = os.path.abspath(INPUT_PATH)
-        log.info("reading from input file: {}".format(abs_path))
+        log.info("Reading from input file: {}".format(abs_path))
         cobalt_ips = ips_from_inputfile(abs_path)
-        log.info("scanning for {0} ips from file".format(len(cobalt_ips)))
+        log.info("Scanning for {0} ips from file".format(len(cobalt_ips)))
 
     NSE_SCRIPT_PATH = os.path.abspath(NSE_SCRIPT_PATH)
     nmap_results = nmap.scan(cobalt_ips, NSE_SCRIPT_PATH, NMAP_PATH, log)
     results = nmap.parse(nmap_results, log)
-    write_results(OUTPUT_FILE, results, log)
+    if results:
+        write_results(OUTPUT_FILE, results, log)
+    else:
+        log.debug("Returned no results, you might not be able to reach the server or they are down!")
 
-    log.info("finished successfully!")
+    log.info("Finished successfully!")

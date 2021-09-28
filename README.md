@@ -141,3 +141,4 @@ Much of this is only possible because whiskey-7 shared with us grab_beacon_confi
 # TODO
 - [ ] add zoomeye
 - [ ] Dedup results before nmap
+- [ ] add checking for latest updated

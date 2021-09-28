@@ -32,12 +32,15 @@ def scan(open_instances, NSE_SCRIPT_PATH, NMAP_PATH, log):
         log.info("Reducing beacon from {}:{}".format(open_instance['ip'],open_instance['port']))
         if open_instance['port'] ==  '':
             cmd = [NMAP_PATH, open_instance['ip'], '--script', NSE_SCRIPT_PATH,'-vv','-d', '-n', '-F', '-T5', '-oX', '-']
+            log.debug("Scanning with nmap: {}".format(' '.join(cmd)))
             result = subprocess.run(cmd, capture_output=True, text=True)
         else:
             cmd = [NMAP_PATH, open_instance['ip'], '-p', str(open_instance['port']), '--script', NSE_SCRIPT_PATH,'-vv','-d', '-n', '-T5', '-oX', '-']
+            log.debug("Scanning with nmap: {}".format(' '.join(cmd)))
             result = subprocess.run(cmd, capture_output=True, text=True)
         json_result = dict()
         json_result = xmltodict.parse(result.stdout)
+
         nmap_results.append(json_result)
     return nmap_results
 
@@ -99,6 +102,8 @@ def parse(nmap_results, log):
                 parsed_result['x64_config_port'] = match['x64']['config']['Port']
             if 'Spawn To x64' in match['x64']['config']:
                 parsed_result['x64_config_spawn_to_x64'] = match['x64']['config']['Spawn To x64']
+            else:
+                continue
             if 'Spawn To x86' in match['x64']['config']:
                 parsed_result['x64_config_spawn_to_x86'] = match['x64']['config']['Spawn To x86']
             if 'Jitter' in match['x64']['config']:
@@ -132,6 +137,8 @@ def parse(nmap_results, log):
                 parsed_result['x64_config_c2_server'] = parsed_c2s
             if 'Beacon Type' in match['x64']['config']:
                 parsed_result['x64_config_beacon_type'] = match['x64']['config']['Beacon Type']
+            else:
+                continue
             if 'HTTP Method Path 2' in match['x64']['config']:
                 parsed_result['x64_config_http_method_path_2'] = match['x64']['config']['HTTP Method Path 2']
             if 'uri_queried' in match['x64']:
