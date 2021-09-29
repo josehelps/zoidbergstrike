@@ -71,14 +71,12 @@ if __name__ == "__main__":
     # grab arguments
     parser = argparse.ArgumentParser(description="Scans for publicly accessible Cobalt Strike Team Servers and grabs the beacon configuration and writes it out as a json log to be analyzed by any analytic tools like Splunk, Elastic, and so forth.")
     parser.add_argument("-c", "--config", required=False, default="zoidbergstrike.conf", help="Path to configuration file. Default: zoidbergstrike.conf")
-    parser.add_argument("-o", "--output", required=False, default='results.json.log', help="File to write results to. Default: results.json.log")
     parser.add_argument("-v", "--version", default=False, action="store_true", required=False, help="Shows current zoidbergstrike version")
     parser.add_argument("-i", "--input", required=False, default = "", help="Newline delimeted file of potential Cobalt Strike Team Servers IP's to grab beacon configurations from. Example - ips.txt")
 
     # parse them
     args = parser.parse_args()
     config = args.config
-    OUTPUT_FILE = args.output
     ARG_VERSION = args.version
     INPUT_PATH = args.input
 
@@ -122,7 +120,7 @@ if __name__ == "__main__":
     NSE_SCRIPT_PATH = os.path.abspath(NSE_SCRIPT_PATH)
     results = nmap.scan(cobalt_ips, NSE_SCRIPT_PATH, NMAP_PATH, log)
     if results:
-        write_results(OUTPUT_FILE, results, log)
+        write_results(config['output'], results, log)
     else:
         log.debug("Returned no results, you might not be able to reach the server or they are down!")
 
