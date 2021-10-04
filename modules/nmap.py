@@ -58,7 +58,7 @@ def parse(result, log):
         if isinstance(result['nmaprun']['host']['ports']['port'], list):
             for port in result['nmaprun']['host']['ports']['port']:
                 if "script" in port:
-                    log.debug("parsing output: {0}".format(port['script']['@output']))
+                    log.debug("Parsing output: {0}".format(port['script']['@output']))
                     # we need to make sure that it is json, this has failed before
                     try:
                         match = json.loads(port['script']['@output'])
@@ -68,13 +68,13 @@ def parse(result, log):
         else:
             if "script" in result['nmaprun']['host']['ports']['port']:
                 port = result['nmaprun']['host']['ports']['port']
-                log.debug("parsing output: {0}".format(port['script']['@output']))
+                log.debug("Parsing output: {0}".format(port['script']['@output']))
                 # we need to make sure that it is json, this has failed before
                 try:
                     match = json.loads(port['script']['@output'])
                     match['port'] = port
                 except Exception as e:
-                    log.info('nmap error: {0}, parsing output: {1}'.format(e, port['script']['@output']))
+                    log.info('Nmap error: {0}, parsing output: {1}'.format(e, port['script']['@output']))
     else:
         log.error("Failed to reduce beacon from {} it appears to be down".format(result['nmaprun']['host']['address']['@addr']))
         return
@@ -172,7 +172,7 @@ def parse(result, log):
         if 'uri_queried' in match['x86']['config']:
             parsed_result['x86_uri_queried'] = match['x86']['uri_queried']
 
-        log.debug("parsed_result:\n{0}".format(json.dumps(parsed_result,indent=2)))
+        log.debug("Parsed_result:\n{0}".format(json.dumps(parsed_result,indent=2)))
         log.info("Successfully reduced beacon from {}:{}".format(parsed_result['ip'], parsed_result['port']))
 
         return parsed_result

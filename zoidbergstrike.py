@@ -97,7 +97,7 @@ if __name__ == "__main__":
     log.info("INIT - zoidbergstrike v" + str(VERSION))
 
     if ARG_VERSION:
-        log.info("version: {0}".format(VERSION))
+        log.info("Version: {0}".format(VERSION))
         sys.exit(0)
 
     NMAP_PATH = nmap.check(log)
