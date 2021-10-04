@@ -109,7 +109,6 @@ if __name__ == "__main__":
         cobalt_ips = []
         abs_path = os.path.abspath(SEARCH_YML)
         searches = read_searches(abs_path)
-        print(searches)
         cobalt_ips = mine_cobalt(searches, config, log)
     else:
         abs_path = os.path.abspath(INPUT_PATH)
