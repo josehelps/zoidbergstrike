@@ -17,4 +17,4 @@ securitytrails:
   # This query is looking only for 3 items in HTTP that are semi-loose but suspicious. No results with ST due to http.title.
   - 'SELECT http.title, http.headers.server, http.headers.content_type, http.headers.raw FROM hosts WHERE http.title = "HTTP/1.1 404 Not Found" AND http.headers.content_type = "text/plain" AND http.headers.raw = "content-length:0"'
   # One off IPs query
-  - '​​SELECT address, ports.port, http.title, isp.name_normalized, ports.port, address, asn.number, http.headers.raw, dns.reverse, egress.hotness, egress.is_egress, jarm FROM ips WHERE address = "162.33.177.113"'
+  - 'SELECT address, ports.port, http.title, isp.name_normalized, ports.port, address, asn.number, http.headers.raw, dns.reverse, egress.hotness, egress.is_egress, jarm FROM ips WHERE address = "162.33.177.113"'
