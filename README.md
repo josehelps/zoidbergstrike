@@ -133,6 +133,13 @@ _note_: will generate alot of noisy results
 * Michael Haag [@M_haggis](https://twitter.com/M_haggis)
 * Jose Hernandez [@d1vious](https://twitter.com/d1vious)
 
+## Support 📞
+Please use the [GitHub issue tracker](https://github.com/splunk/attack_range/issues) to submit bugs or request features.
+
+If you have questions or need support, you can:
+
+* Join the [#security-research](https://splunk-usergroups.slack.com/archives/C1S5BEF38) room in the [Splunk Slack channel](http://splunk-usergroups.slack.com)
+
 # Credits & References
 
 Inspiration came from a handful of blogs:
@@ -142,3 +149,18 @@ Much of this is only possible because whiskey-7 shared with us grab_beacon_confi
 - [ ] add zoomeye
 - [ ] Dedup results before nmap
 - [ ] add checking for latest updated
+
+## License
+Copyright 2020 Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
