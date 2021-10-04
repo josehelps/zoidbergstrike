@@ -29,7 +29,7 @@ def check(log):
 def scan(open_instances, NSE_SCRIPT_PATH, NMAP_PATH, log):
     nmap_results = []
     for open_instance in open_instances:
-        log.info("Reducing beacon from {}:{}".format(open_instance['ip'],open_instance['port']))
+        log.info("Reducing beacon from: {} on ports: {}".format(open_instance['ip'],open_instance['port']))
         if open_instance['port'] ==  '':
             cmd = [NMAP_PATH, open_instance['ip'], '--script', NSE_SCRIPT_PATH,'-vv','-d', '-n', '-F', '-T5', '-oX', '-']
             log.debug("Scanning with nmap: {}".format(' '.join(cmd)))
